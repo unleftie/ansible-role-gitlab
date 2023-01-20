@@ -1,0 +1,28 @@
+service:
+  gitlab-runsvdir.service:
+    enabled: true
+    running: true
+command:
+  gitlab-ctl status:
+    exit-status: 0
+    stderr:
+      [
+        "run: gitaly",
+        "run: postgresql",
+        "run: sidekiq",
+        "run: redis",
+        "run: nginx",
+      ]
+file:
+  /etc/gitlab/gitlab.rb:
+    exists: true
+    mode: "0600"
+    owner: root
+    group: root
+    filetype: file
+  /etc/gitlab/gitlab-secrets.json:
+    exists: true
+    mode: "0600"
+    owner: root
+    group: root
+    filetype: file
