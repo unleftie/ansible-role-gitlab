@@ -11,6 +11,16 @@ gitlab_rails['gitlab_email_display_name'] = "{{ gitlab_email_display_name }}"
 gitlab_rails['gitlab_email_reply_to'] = "{{ gitlab_email_reply_to }}"
 {% endif %}
 
+{% if gitlab_optimization_enable %}
+# Reduce the number of running workers to the minimum in order to reduce memory usage
+# see https://docs.gitlab.com/omnibus/settings/rpi.html
+puma['worker_processes'] = 2
+sidekiq['max_concurrency'] = 9
+{% endif %}
+
+# Turn off monitoring to reduce idle cpu and disk usage
+prometheus_monitoring['enable'] = {{ gitlab_prometheus_monitoring_enable }}
+
 # Default Theme
 gitlab_rails['gitlab_default_theme'] = "{{ gitlab_default_theme }}"
 
