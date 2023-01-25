@@ -10,7 +10,6 @@
   stat: path=/usr/bin/gitlab-ctl
   register: gitlab_file
 
-# Install GitLab and its dependencies.
 - name: Install GitLab dependencies.
   package:
     name: "{{ gitlab_dependencies }}"
@@ -34,38 +33,12 @@
   register: output
   when: not gitlab_file.stat.exists
 
-# fix for https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/5264
-- name: Update GitLab repository to not use signed-by.
-  template:
-    src: "debian_repo.list"
-    dest: "/etc/apt/sources.list.d/gitlab_{{ gitlab_edition }}.list"
+- name: Set keyring permissions.
+  file:
+    path: "/usr/share/keyrings/gitlab_{{ gitlab_edition }}-archive-keyring.gpg"
     owner: root
     group: root
-    mode: 0640
-  register: debian_repo
-  when:
-    - ansible_distribution == "Debian"
-    - ansible_distribution_major_version in ["10", "11"]
-
-- name: Add apt key.
-  get_url:
-    url: "https://packages.gitlab.com/gpg.key"
-    dest: /etc/apt/trusted.gpg.d/gitlab.asc
-    mode: "0644"
-    force: true
-  register: add_repository_key
-  until: add_repository_key is succeeded
-  retries: 5
-  when:
-    - ansible_distribution == "Debian"
-    - debian_repo.changed
-
-- name: Update apt cache.
-  apt:
-    update_cache: yes
-  when:
-    - ansible_distribution == "Debian"
-    - debian_repo.changed
+    mode: 0644
 
 - name: Define the Gitlab package name.
   set_fact:
