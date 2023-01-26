@@ -1,4 +1,29 @@
+---
 skip_list:
-  - 'yaml'
-  - 'role-name'
-  - 'package-latest'
+  - name[casing]
+  - name[template]
+  - key-order[task]
+  - name[missing]
+  - fqcn-builtins
+
+warn_list:
+  - no-changed-when
+  - truthy
+  - no-jinja-when
+  - experimental
+  - ignore-errors
+  - empty-string-compare
+  - var-naming
+  - jinja[spacing]
+  - meta-incorrect
+  - meta-no-info
+  - role-name
+  - namespace
+  - command-instead-of-shell
+  - command-instead-of-module
+  - package-latest
+  - load-failure
+  - yaml[line-length]
+
+exclude_paths:
+  - "*/molecule/*"
