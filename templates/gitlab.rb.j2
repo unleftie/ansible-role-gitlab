@@ -19,7 +19,12 @@ sidekiq['max_concurrency'] = 9
 {% endif %}
 
 # Turn off monitoring to reduce idle cpu and disk usage
-prometheus_monitoring['enable'] = {{ gitlab_prometheus_monitoring_enable }}
+prometheus_monitoring['enable'] = {{ gitlab_prometheus_monitoring_enable | lower }}
+prometheus['flags'] = {'storage.tsdb.path' => "/var/opt/gitlab/prometheus/data",'storage.tsdb.retention.time' => "1d",'config.file' => "/var/opt/gitlab/prometheus/prometheus.yml"}
+node_exporter['enable'] = {{ gitlab_node_exporter_monitoring_enable | lower }}
+
+gitlab_pages['enable'] = {{ gitlab_pages_enable | lower }}
+
 
 # Default Theme
 gitlab_rails['gitlab_default_theme'] = "{{ gitlab_default_theme }}"
@@ -66,6 +71,14 @@ nginx['listen_port'] = "{{ gitlab_nginx_listen_port }}"
 {% if gitlab_nginx_listen_https is defined %}
 nginx['listen_https'] = {{ gitlab_nginx_listen_https | lower }}
 {% endif %}
+nginx['http2_enabled'] = {{ gitlab_nginx_http2_enabled | lower }}
+nginx['hsts_max_age'] = 31536000
+nginx['hsts_include_subdomains'] = {{ gitlab_nginx_hsts_include_subdomains | lower }}
+nginx['referrer_policy'] = 'strict-origin-when-cross-origin'
+nginx['custom_nginx_config'] = 'proxy_hide_header X-Powered-By;'
+nginx['custom_nginx_config'] = 'add_header X-Frame-Options "SAMEORIGIN" always;'
+nginx['custom_nginx_config'] = 'add_header X-XSS-Protection "1; mode=block" always;'
+nginx['custom_nginx_config'] = 'add_header X-Content-Type-Options "nosniff" always;'
 
 # Use smtp instead of sendmail/postfix
 # More details and example configuration at
