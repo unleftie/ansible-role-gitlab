@@ -99,3 +99,7 @@ gitlab_optimization_enable: true
 # Turn off monitoring to reduce idle cpu and disk usage
 gitlab_prometheus_monitoring_enable: false
 gitlab_node_exporter_monitoring_enable: false
+
+gitlab_omniauth_google_oauth2_enable: true
+gitlab_omniauth_google_oauth2_app_id: "{{ vault_gitlab_omniauth_google_oauth2_app_id | default('app_id', true) }}"
+gitlab_omniauth_google_oauth2_app_secret: "{{ vault_gitlab_omniauth_google_oauth2_app_secret | default('app_secret', true) }}"

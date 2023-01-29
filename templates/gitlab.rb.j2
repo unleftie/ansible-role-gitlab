@@ -18,6 +18,18 @@ puma['worker_processes'] = 2
 sidekiq['max_concurrency'] = 9
 {% endif %}
 
+{% if gitlab_omniauth_google_oauth2_enable %}
+gitlab_rails['omniauth_allow_single_sign_on'] = ['google_oauth2']
+gitlab_rails['omniauth_providers'] = [
+  {
+    name: "google_oauth2",
+    app_id: "{{ gitlab_omniauth_google_oauth2_app_id }}",
+    app_secret: "{{ gitlab_omniauth_google_oauth2_app_secret }}",
+    args: { access_type: "offline", approval_prompt: "" }
+  }
+]
+{% endif %}
+
 # Turn off monitoring to reduce idle cpu and disk usage
 prometheus_monitoring['enable'] = {{ gitlab_prometheus_monitoring_enable | lower }}
 prometheus['flags'] = {'storage.tsdb.path' => "/var/opt/gitlab/prometheus/data",'storage.tsdb.retention.time' => "1d",'config.file' => "/var/opt/gitlab/prometheus/prometheus.yml"}
