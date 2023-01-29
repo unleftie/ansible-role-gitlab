@@ -41,10 +41,11 @@ gitlab_email_reply_to: "gitlab@{{ gitlab_root_domain }}"
 
 # SMTP configuration
 gitlab_smtp_enable: false
+gitlab_smtp_root_domain: "example.com"
 gitlab_smtp_address: "smtp.server"
 gitlab_smtp_port: "465"
-gitlab_smtp_user_name: "smtp user"
-gitlab_smtp_password: "smtp password"
+gitlab_smtp_user_name: "gitlab@{{ gitlab_smtp_root_domain }}"
+gitlab_smtp_password: "{{ vault_gitlab_smtp_password | default('smtp_password', true) }}"
 gitlab_smtp_domain: "{{ gitlab_root_domain }}"
 gitlab_smtp_authentication: "login"
 gitlab_smtp_enable_starttls_auto: true
