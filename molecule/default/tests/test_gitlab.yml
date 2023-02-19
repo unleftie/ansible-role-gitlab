@@ -5,7 +5,7 @@ service:
 command:
   gitlab-ctl status:
     exit-status: 0
-    stderr:
+    stdout:
       [
         "run: gitaly",
         "run: postgresql",
