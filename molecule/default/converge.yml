@@ -4,12 +4,6 @@
   become: true
   environment:
     PATH: "{{ ansible_env.PATH }}:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
-  pre_tasks:
-    - name: Ensure apt cache are updated
-      apt:
-        update_cache: true
-        cache_valid_time: 3600
-      when: ansible_os_family == "Debian"
   tasks:
     - include_role:
-        name: "gitlab"
+        name: "{{ lookup('env', 'ROLE_NAME') | default('ansible-role-gitlab', true) }}"

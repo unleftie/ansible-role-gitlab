@@ -1,0 +1,62 @@
+---
+name: Ansible CI
+
+on:
+  push:
+    branches: ["master", "main"]
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.*"
+
+      - name: Install test dependencies.
+        run: python3 -m pip install ansible-lint
+
+      - name: Lint code.
+        run: |
+          ansible-lint .
+
+  molecule:
+    name: Molecule
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        distro:
+          - rockylinux9
+          - ubuntu2204
+          - debian11
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.*"
+
+      - name: Install test dependencies.
+        run: python3 -m pip install ansible molecule[docker] docker
+
+      - name: Run Molecule tests
+        run: molecule test
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
+          MOLECULE_DISTRO: ${{ matrix.distro }}
+          ROLE_NAME: ${{ github.event.repository.name }}
+          GHA_TOKEN: ${{ secrets.GHA_TOKEN }}
