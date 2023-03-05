@@ -23,7 +23,7 @@
     - block:
         - name: Get latest Goss release
           uri:
-            url: "https://api.github.com/repos/aelsabbahy/goss/releases/latest"
+            url: "https://${GHA_TOKEN}@api.github.com/repos/aelsabbahy/goss/releases/latest"
             method: GET
             return_content: true
             status_code: 200
@@ -44,8 +44,8 @@
         dest: "{{ goss_dst }}"
         checksum: "sha256:{{ goss_url }}.sha256"
         mode: 0755
-      register: _download_file
-      until: _download_file is succeeded
+      register: _progress_status
+      until: _progress_status is succeeded
       retries: 5
 
     - name: Copy Goss tests to remote
