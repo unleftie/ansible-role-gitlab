@@ -1,5 +1,3 @@
-*.retry
-*/__pycache__
-*.pyc
-.cache
-
+# Local .vscode directories
+**/.vscode/*
+*.code-workspace

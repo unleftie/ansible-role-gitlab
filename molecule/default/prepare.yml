@@ -1,0 +1,20 @@
+---
+- name: Prepare
+  hosts: all
+  become: true
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
+  tasks:
+    - name: Ensure apt cache are updated
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure unnecessary dependencies are removed
+      package:
+        name: curl-minimal
+        state: absent
+      register: _progress_status
+      until: _progress_status is succeeded
+      retries: 5

@@ -1,0 +1,40 @@
+---
+name: Checkmarx KICS
+
+on:
+  push:
+    branches: ["master", "main"]
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+jobs:
+  scan:
+    name: Checkmarx KICS
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      issues: write # for checkmarx/kics-github-action to write feedback to github issues
+      pull-requests: write # for checkmarx/kics-github-action to write feedback to PR
+      security-events: write # for github/codeql-action/upload-sarif to upload report for CodeQL/Security Alerts
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run KICS
+        uses: checkmarx/kics-github-action@v1
+        with:
+          path: "tasks"
+          fail_on: high
+          output_formats: "json,sarif"
+
+      - name: Display report
+        run: |
+          cat results.json
+
+      - name: Upload report for CodeQL/Security Alerts
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif

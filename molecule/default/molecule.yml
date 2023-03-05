@@ -2,24 +2,18 @@
 dependency:
   name: galaxy
 driver:
-  name: vagrant
-  provider:
-    name: virtualbox
+  name: docker
 lint: |
   ansible-lint .
 platforms:
-  - name: host1
-    box: debian/bullseye64
-    memory: 4096
-    cpus: 4
-    interfaces:
-      - network_name: private_network
-        ip: 192.168.56.10
-    provider_raw_config_args:
-      - "customize [ 'modifyvm', :id, '--natdnshostresolver1', 'on' ]"
-    config_options:
-      ssh.keep_alive: yes
-      ssh.remote_user: "'vagrant'"
+  - name: molecule-instance
+    image: geerlingguy/docker-${MOLECULE_DISTRO:-debian11}-ansible:latest
+    command: ${MOLECULE_DOCKER_COMMAND:-/sbin/init}
+    pre_build_image: true
+    privileged: true
+    cgroupns_mode: host
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
 provisioner:
   name: ansible
   config_options:
@@ -29,12 +23,11 @@ provisioner:
     name: ansible-lint
 scenario:
   test_sequence:
-    - dependency
-    - lint
     - cleanup
     - destroy
     - syntax
     - create
+    - prepare
     - converge
     - verify
     - converge

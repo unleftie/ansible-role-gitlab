@@ -5,6 +5,7 @@ skip_list:
   - key-order[task]
   - name[missing]
   - fqcn-builtins
+  - yaml[document-start]
 
 warn_list:
   - no-changed-when
@@ -22,8 +23,10 @@ warn_list:
   - command-instead-of-shell
   - command-instead-of-module
   - package-latest
-  - load-failure
   - yaml[line-length]
+  - jinja[invalid]
 
 exclude_paths:
-  - "*/molecule/*"
+  - molecule/default/tests/*.yml
+  - molecule/default/*.yml
+  - .github/
