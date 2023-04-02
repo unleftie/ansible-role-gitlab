@@ -3,10 +3,12 @@
   hosts: all
   become: true
   vars:
+    github_user: "aelsabbahy"
+    github_repo: "goss"
     goss_version: "latest"
     goss_arch: "amd64"
     goss_dst: "/usr/bin/goss"
-    goss_url: "https://${GHA_TOKEN}@github.com/aelsabbahy/goss/releases/download/{{ goss_version }}/goss-linux-{{ goss_arch }}"
+    goss_url: "https://github.com/{{ github_user }}/{{ github_repo }}/releases/download/{{ goss_version }}/goss-linux-{{ goss_arch }}"
     goss_test_directory: "/tmp"
     goss_format: "tap"
   tasks:
@@ -20,21 +22,25 @@
         dir: "../../vars"
         extensions: ["yml"]
 
-    - block:
-        - name: Get latest Goss release
-          uri:
-            url: "https://${GHA_TOKEN}@api.github.com/repos/aelsabbahy/goss/releases/latest"
-            method: GET
-            return_content: true
-            status_code: 200
-            body_format: json
+    - name: Ensure dependencies are installed
+      pip:
+        name: github3.py
+
+    - name: Get latest Goss release
+      block:
+        - name: Get latest release
+          community.general.github_release:
+            user: "{{ github_user }}"
+            repo: "{{ github_repo }}"
+            token: "{{ lookup('env', 'GHA_TOKEN') }}"
+            action: latest_release
           register: _latest_release
-          until: _latest_release.status == 200
+          until: _latest_release is succeeded
           retries: 5
 
-        - name: "Set Goss version to {{ _latest_release.json.tag_name[1:] }}"
+        - name: "Set version tag to {{ _latest_release.tag }}"
           set_fact:
-            goss_version: "v{{ _latest_release.json.tag_name[1:] }}"
+            goss_version: "{{ _latest_release.tag }}"
       when: goss_version == "latest"
       run_once: true
 
@@ -44,6 +50,8 @@
         dest: "{{ goss_dst }}"
         checksum: "sha256:{{ goss_url }}.sha256"
         mode: 0755
+        headers:
+          Authorization: "Bearer {{ lookup('env', 'GHA_TOKEN') }}"
       register: _progress_status
       until: _progress_status is succeeded
       retries: 5
