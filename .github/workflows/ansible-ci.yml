@@ -48,7 +48,7 @@ jobs:
           python-version: "3.*"
 
       - name: Install test dependencies.
-        run: python3 -m pip install ansible molecule[docker] docker jmespath
+        run: python3 -m pip install ansible molecule molecule-plugins[docker] docker jmespath
 
       - name: Run Molecule tests
         run: molecule test
