@@ -36,7 +36,7 @@ jobs:
     strategy:
       matrix:
         distro:
-          - debian11
+          - debian12
 
     steps:
       - name: Checkout
