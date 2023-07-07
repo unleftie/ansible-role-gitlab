@@ -1,0 +1,17 @@
+---
+dependencies: []
+
+galaxy_info:
+  role_name: gitlab
+  author: unleftie
+  description: Role for Omnibus Gitlab setup
+  company: ""
+  license: "license (MIT)"
+  min_ansible_version: "2.10"
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+  galaxy_tags:
+    - gitlab
+    - omnibus
