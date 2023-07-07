@@ -86,7 +86,7 @@ jobs:
   molecule:
     name: Ansible Molecule
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     if: |
       inputs.runMolecule == true || 
       github.event_name == 'push' || 
