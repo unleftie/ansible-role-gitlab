@@ -50,7 +50,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ github.repository_owner }}/${{ env.ACTIONS_REPOSITORY }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GHA_TOKEN }}
           path: gha_templates
           fetch-depth: 0
 
@@ -76,7 +76,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ github.repository_owner }}/${{ env.ACTIONS_REPOSITORY }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GHA_TOKEN }}
           path: gha_templates
           fetch-depth: 0
 
@@ -105,13 +105,13 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ github.repository_owner }}/${{ env.ACTIONS_REPOSITORY }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GHA_TOKEN }}
           path: gha_templates
           fetch-depth: 0
 
       - name: Run Ansible Molecule
         uses: ./gha_templates/ansible-molecule
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GHA_TOKEN }}
           role_name: ${{ github.event.repository.name }}
           distro: ${{ matrix.distro }}
