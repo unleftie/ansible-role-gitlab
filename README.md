@@ -1,7 +1,6 @@
 # Role for Omnibus Gitlab setup
 
-[![Ansible CI](https://github.com/unleftie/ansible-role-gitlab/actions/workflows/ansible-ci.yml/badge.svg)](https://github.com/unleftie/ansible-role-gitlab/actions/workflows/ansible-ci.yml)
-[![Checkmarx KICS](https://github.com/unleftie/ansible-role-gitlab/actions/workflows/checkmarx-kics.yml/badge.svg)](https://github.com/unleftie/ansible-role-gitlab/actions/workflows/checkmarx-kics.yml)
+[![CI](https://github.com/unleftie/ansible-role-gitlab/actions/workflows/ci.yml/badge.svg)](https://github.com/unleftie/ansible-role-gitlab/actions/workflows/ci.yml)
 
 ## Compatibility
 
