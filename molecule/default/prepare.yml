@@ -17,4 +17,5 @@
         state: absent
       register: _progress_status
       until: _progress_status is succeeded
+      delay: 3
       retries: 5
