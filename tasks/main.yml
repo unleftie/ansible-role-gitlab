@@ -16,11 +16,17 @@
   package:
     name: "{{ gitlab_dependencies }}"
     state: present
+  register: _progress_status
+  until: _progress_status is succeeded
+  retries: 5
 
 - name: Install GitLab dependencies (Debian).
   apt:
     name: gnupg2
     state: present
+  register: _progress_status
+  until: _progress_status is succeeded
+  retries: 5
   when: ansible_os_family == 'Debian'
 
 - name: Download GitLab repository installation script.
@@ -52,6 +58,9 @@
   package:
     name: "{{ gitlab_package_name | default(gitlab_edition) }}"
     state: present
+  register: _progress_status
+  until: _progress_status is succeeded
+  retries: 5
   async: 300
   poll: 5
   when: not gitlab_file.stat.exists
