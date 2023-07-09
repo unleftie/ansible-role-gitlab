@@ -25,6 +25,10 @@
     - name: Ensure dependencies are installed
       pip:
         name: github3.py
+      register: _progress_status
+      until: _progress_status is succeeded
+      delay: 5
+      retries: 5
 
     - name: Get latest Goss release
       block:
@@ -36,6 +40,7 @@
             action: latest_release
           register: _latest_release
           until: _latest_release is succeeded
+          delay: 5
           retries: 5
 
         - name: "Set version tag to {{ _latest_release.tag }}"
@@ -49,19 +54,19 @@
         url: "{{ goss_url }}"
         dest: "{{ goss_dst }}"
         checksum: "sha256:{{ goss_url }}.sha256"
-        mode: 0755
+        mode: "0755"
         headers:
           Authorization: "Bearer {{ lookup('env', 'GHA_TOKEN') }}"
       register: _progress_status
       until: _progress_status is succeeded
-      delay: 3
+      delay: 5
       retries: 5
 
     - name: Copy Goss tests to remote
       template:
         src: "{{ item }}"
         dest: "{{ goss_test_directory }}/{{ item | basename }}"
-        mode: 0644
+        mode: "0644"
       with_fileglob:
         - "{{ lookup('env', 'MOLECULE_VERIFIER_TEST_DIRECTORY') }}/test_*.yml"
 

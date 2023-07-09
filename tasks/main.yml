@@ -18,7 +18,7 @@
     state: present
   register: _progress_status
   until: _progress_status is succeeded
-  delay: 3
+  delay: 5
   retries: 5
 
 - name: Install GitLab dependencies (Debian).
@@ -27,7 +27,7 @@
     state: present
   register: _progress_status
   until: _progress_status is succeeded
-  delay: 3
+  delay: 5
   retries: 5
   when: ansible_os_family == 'Debian'
 
@@ -62,7 +62,7 @@
     state: present
   register: _progress_status
   until: _progress_status is succeeded
-  delay: 3
+  delay: 5
   retries: 5
   async: 300
   poll: 5
