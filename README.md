@@ -36,8 +36,6 @@ molecule test
 - name: Sample 1
   hosts: all
   become: true
-  environment:
-    PATH: "{{ ansible_env.PATH }}:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
   pre_tasks:
     - name: Ensure apt cache are updated
       apt:

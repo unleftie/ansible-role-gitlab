@@ -2,8 +2,6 @@
 - name: Converge
   hosts: all
   become: true
-  environment:
-    PATH: "{{ ansible_env.PATH }}:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
   tasks:
     - include_role:
         name: "{{ lookup('env', 'ROLE_NAME') | default('ansible-role-gitlab', true) }}"

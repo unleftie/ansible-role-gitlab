@@ -2,8 +2,6 @@
 - name: Prepare
   hosts: all
   become: true
-  environment:
-    PATH: "{{ ansible_env.PATH }}:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
   tasks:
     - name: Ensure apt cache are updated
       apt:
