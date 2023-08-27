@@ -3,6 +3,10 @@
   hosts: all
   become: true
   tasks:
+    - name: Wait for automatic system updates
+      shell: while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 1; done;
+      changed_when: false
+
     - name: Ensure apt cache are updated
       apt:
         update_cache: true
