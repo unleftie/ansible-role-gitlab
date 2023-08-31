@@ -6,11 +6,17 @@
     github_user: "aelsabbahy"
     github_repo: "goss"
     goss_version: "latest"
-    goss_arch: "amd64"
+    goss_arch: "{{ goss_arch_map[ansible_architecture] | default(ansible_architecture) }}"
     goss_dst: "/usr/bin/goss"
     goss_url: "https://github.com/{{ github_user }}/{{ github_repo }}/releases/download/{{ goss_version }}/goss-linux-{{ goss_arch }}"
     goss_test_directory: "/tmp"
     goss_format: "tap"
+    goss_arch_map:
+      i386: "386"
+      x86_64: "amd64"
+      aarch64: "arm64"
+      armv7l: "armv7"
+      armv6l: "armv6"
   tasks:
     - name: Include defaults vars
       include_vars:
