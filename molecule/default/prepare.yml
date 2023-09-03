@@ -10,7 +10,8 @@
     - name: Ensure apt cache are updated
       apt:
         update_cache: true
-        cache_valid_time: 3600
+        update_cache_retries: 5
+        update_cache_retry_max_delay: 5
       register: _progress_status
       until: _progress_status is succeeded
       delay: 5
