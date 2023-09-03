@@ -21,12 +21,12 @@
     - name: Include defaults vars
       include_vars:
         dir: "../../defaults"
-        extensions: ["yml"]
+        extensions: ["yml", "yaml"]
 
     - name: Include vars
       include_vars:
         dir: "../../vars"
-        extensions: ["yml"]
+        extensions: ["yml", "yaml"]
 
     - name: Ensure dependencies are installed
       pip:
