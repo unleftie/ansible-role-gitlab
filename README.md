@@ -15,12 +15,6 @@
 - [Molecule](https://molecule.readthedocs.io/en/latest/installation.html) + (v4.0.4+) + [docker plugin](https://github.com/ansible-community/molecule-plugins) (for local testing)
 - [Docker](https://docs.docker.com/get-docker/) (for local testing)
 
-## Repository secrets
-
-| Variable  | Description                                            | Value  |
-| --------- | ------------------------------------------------------ | ------ |
-| GHA_TOKEN | Github Token with public repositories read-only access | string |
-
 ## Local Testing
 
 ```sh

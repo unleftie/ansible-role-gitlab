@@ -20,8 +20,6 @@ on:
     branches: ["master", "main"]
   pull_request:
     branches: ["master", "main"]
-  schedule:
-    - cron: "30 0 * * 0"
 
 env:
   ACTIONS_REPOSITORY: "gha-templates"
@@ -59,7 +57,7 @@ jobs:
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           repository: ${{ github.repository_owner }}/${{ env.ACTIONS_REPOSITORY }}
-          token: ${{ secrets.GHA_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           path: gha_templates
           fetch-depth: 0
 
@@ -91,7 +89,7 @@ jobs:
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           repository: ${{ github.repository_owner }}/${{ env.ACTIONS_REPOSITORY }}
-          token: ${{ secrets.GHA_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           path: gha_templates
           fetch-depth: 0
 
@@ -126,13 +124,13 @@ jobs:
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           repository: ${{ github.repository_owner }}/${{ env.ACTIONS_REPOSITORY }}
-          token: ${{ secrets.GHA_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           path: gha_templates
           fetch-depth: 0
 
       - name: Run Ansible Molecule
         uses: ./gha_templates/ansible-molecule
         with:
-          github_token: ${{ secrets.GHA_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           role_name: ${{ github.event.repository.name }}
           distro: ${{ matrix.distro }}

@@ -1,9 +1,9 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    directory: "/.github"
+    directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     commit-message:
       prefix: "chore"
       include: "scope"
