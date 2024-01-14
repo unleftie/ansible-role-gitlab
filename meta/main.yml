@@ -3,7 +3,7 @@ dependencies: []
 
 galaxy_info:
   role_name: gitlab
-  author: unleftie
+  author: denysrondaliev
   description: Role for Omnibus Gitlab setup
   company: ""
   license: "license (MIT)"
