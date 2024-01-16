@@ -1,7 +1,7 @@
 # Role for Omnibus Gitlab setup
 
-[![CI](https://github.com/denysrondaliev/ansible-role-gitlab/actions/workflows/ci.yml/badge.svg)](https://github.com/denysrondaliev/ansible-role-gitlab/actions/workflows/ci.yml)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/denysrondaliev/ansible-role-gitlab/badge)](https://securityscorecards.dev/viewer/?uri=github.com/denysrondaliev/ansible-role-gitlab)
+[![CI](https://github.com/unleftie/ansible-role-gitlab/actions/workflows/ci.yml/badge.svg)](https://github.com/unleftie/ansible-role-gitlab/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/unleftie/ansible-role-gitlab/badge)](https://securityscorecards.dev/viewer/?uri=github.com/unleftie/ansible-role-gitlab)
 
 ## Compatibility
 
@@ -18,7 +18,7 @@
 ## Local Testing
 
 ```sh
-git clone https://github.com/denysrondaliev/ansible-role-gitlab.git
+git clone https://github.com/unleftie/ansible-role-gitlab.git
 cd ansible-role-gitlab/
 molecule test
 ```
