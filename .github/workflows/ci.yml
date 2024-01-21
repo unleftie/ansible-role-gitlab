@@ -22,7 +22,7 @@ on:
     branches: ["master", "main"]
 
 env:
-  ACTIONS_REPOSITORY: "gha-templates"
+  KICS_SCAN_PATH: "./"
 
 # Declare default permissions as read only.
 permissions: read-all
@@ -53,18 +53,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Checkout actions repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-        with:
-          repository: ${{ github.repository_owner }}/${{ env.ACTIONS_REPOSITORY }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: gha_templates
-          fetch-depth: 0
-
       - name: Run KICS scan
-        uses: ./gha_templates/checkmarx-kics
+        uses: checkmarx/kics-github-action@8a44970e3d2eca668be41abe9d4e06709c3b3609 # v1.7.0
         with:
-          path: "tasks"
+          path: ${{ env.KICS_SCAN_PATH }}
+          fail_on: high
+          output_formats: "json,sarif"
+        continue-on-error: true
+
+      - name: Upload to code-scanning
+        uses: github/codeql-action/upload-sarif@00e563ead9f72a8461b24876bee2d0c2e8bd2ee8 # v2.21.5
+        with:
+          sarif_file: results.sarif
 
   lint:
     name: Ansible Lint
@@ -85,16 +85,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Checkout actions repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-        with:
-          repository: ${{ github.repository_owner }}/${{ env.ACTIONS_REPOSITORY }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: gha_templates
-          fetch-depth: 0
-
       - name: Run Ansible Lint
-        uses: ./gha_templates/ansible-lint
+        uses: unleftie/ansible-lint-action@5e48b42dbdaef17c54c526b52776426f5819a818 # v1.0.3
 
   molecule:
     name: Ansible Molecule
@@ -120,16 +112,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Checkout actions repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-        with:
-          repository: ${{ github.repository_owner }}/${{ env.ACTIONS_REPOSITORY }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: gha_templates
-          fetch-depth: 0
-
       - name: Run Ansible Molecule
-        uses: ./gha_templates/ansible-molecule
+        uses: unleftie/ansible-molecule-action@22635a495dd572eb6cf70791f1af9a75979caf7d # v1.6.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           role_name: ${{ github.event.repository.name }}
