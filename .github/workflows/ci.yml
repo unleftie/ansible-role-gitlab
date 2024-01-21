@@ -15,8 +15,7 @@ on:
         type: boolean
         default: true
   push:
-    paths-ignore:
-      - README.md
+    paths-ignore: ["**.md", "LICENSE", ".github/dependabot.yml"]
     branches: ["master", "main"]
   pull_request:
     branches: ["master", "main"]
