@@ -23,8 +23,9 @@ on:
 env:
   KICS_SCAN_PATH: "./"
 
-# Declare default permissions as read only.
-permissions: read-all
+permissions:
+  packages: write
+  contents: write
 
 jobs:
   scan:
@@ -58,6 +59,7 @@ jobs:
           path: ${{ env.KICS_SCAN_PATH }}
           fail_on: high
           output_formats: "json,sarif"
+          exclude_paths: ".github/workflows/scorecard.yml"
         continue-on-error: true
 
       - name: Upload to code-scanning
@@ -117,3 +119,21 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           role_name: ${{ github.event.repository.name }}
           distro: ${{ matrix.distro }}
+
+  release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    needs: [scan, lint, molecule]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Semantic Release
+        id: semrel
+        uses: go-semantic-release/action@1b14387401a1c3b588c807afd4ba4a921fd9cc31 # v1.21.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          changelog-generator-opt: "emojis=true"
