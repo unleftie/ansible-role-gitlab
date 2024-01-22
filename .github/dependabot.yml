@@ -9,3 +9,6 @@ updates:
       include: "scope"
     labels:
       - "enhancement"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
