@@ -35,7 +35,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Approve patch and minor updates
-        run: gh pr review $PR_URL --approve -b "I'm **approving** this pull request because **it includes a patch or minor update**"
+        run: gh pr review $PR_URL --approve -b "I'm **approving** this pull request because **it includes a major or minor update**"
         shell: bash
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
