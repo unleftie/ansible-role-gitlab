@@ -14,6 +14,11 @@ on:
         description: Run Ansible Molecule
         type: boolean
         default: true
+      publishRelease:
+        description: Publish Release
+        type: boolean
+        default: false
+        required: false
   push:
     paths-ignore: ["**.md", "LICENSE", ".github/dependabot.yml"]
     branches: ["master", "main"]
@@ -22,10 +27,6 @@ on:
 
 env:
   KICS_SCAN_PATH: "./"
-
-permissions:
-  packages: write
-  contents: write
 
 jobs:
   scan:
@@ -121,9 +122,15 @@ jobs:
           distro: ${{ matrix.distro }}
 
   release:
-    name: Semantic Release
+    name: Publish Release
     runs-on: ubuntu-latest
+    if: inputs.publishRelease == true || github.event_name == 'push'
     needs: [scan, lint, molecule]
+    permissions:
+      packages: write
+      contents: write
+      issues: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -132,8 +139,8 @@ jobs:
           persist-credentials: false
 
       - name: Semantic Release
-        id: semrel
-        uses: go-semantic-release/action@1b14387401a1c3b588c807afd4ba4a921fd9cc31 # v1.21.0
+        uses: cycjimmy/semantic-release-action@61680d0e9b02ff86f5648ade99e01be17f0260a4 #v4.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          changelog-generator-opt: "emojis=true"
+          extra_plugins: conventional-changelog-conventionalcommits@6.1.0
