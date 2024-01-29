@@ -115,7 +115,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Run Ansible Molecule
-        uses: unleftie/ansible-molecule-action@22635a495dd572eb6cf70791f1af9a75979caf7d # v1.6.3
+        uses: unleftie/ansible-molecule-action@e8cecf7f6dfab2293dd28df032318e6a698c60a3 # v1.7.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           role_name: ${{ github.event.repository.name }}
