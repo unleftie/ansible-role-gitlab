@@ -5,7 +5,8 @@ on:
       runKics:
         description: Run KICS scan
         type: boolean
-        default: true
+        default: false
+        required: false
       runLint:
         description: Run Ansible Lint
         type: boolean
@@ -23,6 +24,7 @@ on:
     paths-ignore: ["**.md", "LICENSE", ".github/dependabot.yml"]
     branches: ["master", "main"]
   pull_request:
+    paths-ignore: ["**.md", "LICENSE", ".github/dependabot.yml"]
     branches: ["master", "main"]
 
 env:
@@ -36,8 +38,7 @@ jobs:
     if: |
       inputs.runKics == true ||
       github.event_name == 'push' ||
-      github.event_name == 'pull_request' ||
-      github.event_name == 'schedule'
+      github.event_name == 'pull_request'
     permissions:
       contents: read
       issues: write
@@ -64,7 +65,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload to code-scanning
-        uses: github/codeql-action/upload-sarif@c7f9125735019aa87cfc361530512d50ea439c71 # v3.25.1
+        uses: github/codeql-action/upload-sarif@d39d31e687223d841ef683f52467bd88e9b21c14 # v3.25.3
         with:
           sarif_file: results.sarif
 
@@ -75,8 +76,7 @@ jobs:
     if: |
       inputs.runLint == true ||
       github.event_name == 'push' ||
-      github.event_name == 'pull_request' ||
-      github.event_name == 'schedule'
+      github.event_name == 'pull_request'
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
@@ -97,8 +97,7 @@ jobs:
     if: |
       inputs.runMolecule == true ||
       github.event_name == 'push' ||
-      github.event_name == 'pull_request' ||
-      github.event_name == 'schedule'
+      github.event_name == 'pull_request'
     strategy:
       matrix:
         distro:
@@ -117,21 +116,30 @@ jobs:
       - name: Run Ansible Molecule
         uses: unleftie/ansible-molecule-action@e8cecf7f6dfab2293dd28df032318e6a698c60a3 # v1.7.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ github.token }}
           role_name: ${{ github.event.repository.name }}
           distro: ${{ matrix.distro }}
 
   release:
     name: Publish Release
     runs-on: ubuntu-latest
-    if: inputs.publishRelease == true || github.event_name == 'push'
-    needs: [scan, lint, molecule]
+    if: |
+      inputs.publishRelease == true ||
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request'
+    needs: [scan]
     permissions:
       packages: write
       contents: write
       issues: write
       pull-requests: write
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
@@ -141,6 +149,8 @@ jobs:
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@cb425203a562475bca039ba4dbf90c7f9ac790f4 #v4.1.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-          extra_plugins: conventional-changelog-conventionalcommits@6.1.0
+          extra_plugins: |
+            conventional-changelog-conventionalcommits@6.1.0
+            @semantic-release/github@10.1.1
