@@ -5,7 +5,7 @@ on:
       runKics:
         description: Run KICS scan
         type: boolean
-        default: false
+        default: true
         required: false
       runLint:
         description: Run Ansible Lint
@@ -23,9 +23,10 @@ on:
   push:
     paths-ignore: ["**.md", "LICENSE", ".github/dependabot.yml"]
     branches: ["master", "main"]
-  pull_request:
+  pull_request_target:
     paths-ignore: ["**.md", "LICENSE", ".github/dependabot.yml"]
     branches: ["master", "main"]
+    types: [opened, reopened]
 
 env:
   KICS_SCAN_PATH: "./"
@@ -38,7 +39,7 @@ jobs:
     if: |
       inputs.runKics == true ||
       github.event_name == 'push' ||
-      github.event_name == 'pull_request'
+      github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
       issues: write
@@ -65,7 +66,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload to code-scanning
-        uses: github/codeql-action/upload-sarif@d39d31e687223d841ef683f52467bd88e9b21c14 # v3.25.3
+        uses: github/codeql-action/upload-sarif@eb055d739abdc2e8de2e5f4ba1a8b246daa779aa # v3.26.0
         with:
           sarif_file: results.sarif
 
@@ -76,7 +77,7 @@ jobs:
     if: |
       inputs.runLint == true ||
       github.event_name == 'push' ||
-      github.event_name == 'pull_request'
+      github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]'
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
@@ -97,8 +98,9 @@ jobs:
     if: |
       inputs.runMolecule == true ||
       github.event_name == 'push' ||
-      github.event_name == 'pull_request'
+      github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]'
     strategy:
+      fail-fast: false
       matrix:
         distro:
           - debian12
@@ -126,8 +128,8 @@ jobs:
     if: |
       inputs.publishRelease == true ||
       github.event_name == 'push' ||
-      github.event_name == 'pull_request'
-    needs: [scan]
+      github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]'
+    needs: [scan, lint, molecule]
     permissions:
       packages: write
       contents: write
