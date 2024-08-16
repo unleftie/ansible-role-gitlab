@@ -35,7 +35,7 @@
   get_url:
     url: "{{ gitlab_repository_installation_script_url }}"
     dest: /tmp/gitlab_install_repository.sh
-    mode: 0755
+    mode: "0755"
     validate_certs: "{{ gitlab_download_validate_certs }}"
   when: not gitlab_file.stat.exists
 
@@ -49,7 +49,7 @@
     path: "/usr/share/keyrings/gitlab_{{ gitlab_edition }}-archive-keyring.gpg"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
 - name: Define the Gitlab package name.
   set_fact:
