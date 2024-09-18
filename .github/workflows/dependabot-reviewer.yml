@@ -38,7 +38,7 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: Approve and Merge PR
-        uses: fastify/github-action-merge-dependabot@9e7bfb249c69139d7bdcd8d984f9665edd49020b # v3.10.1
+        uses: fastify/github-action-merge-dependabot@main
         with:
           approve-only: false
           merge-comment: "I'm **approving** this PR because **it includes dependency update**"
