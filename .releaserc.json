@@ -1,17 +1,56 @@
 {
-  "branches": ["main", "master", "dependabot*"],
+  "branches": ["main", "master"],
   "ci": false,
   "plugins": [
     [
       "@semantic-release/commit-analyzer",
       {
-        "preset": "conventionalcommits"
+        "preset": "conventionalCommits",
+        "releaseRules": [
+          { "type": "revert", "release": "patch" },
+          { "type": "docs", "release": "patch" },
+          { "type": "style", "release": "patch" },
+          { "type": "chore", "release": "patch" },
+          { "type": "refactor", "release": "patch" },
+          { "type": "test", "release": "patch" },
+          { "type": "build", "release": "patch" },
+          { "type": "ci", "release": "patch" },
+          { "type": "improvement", "release": "patch" }
+        ]
       }
     ],
     [
       "@semantic-release/release-notes-generator",
       {
-        "preset": "conventionalcommits"
+        "preset": "conventionalCommits",
+        "presetConfig": {
+          "types": [
+            { "type": "feat", "section": "Features" },
+            { "type": "fix", "section": "Bug Fixes" },
+            { "type": "perf", "section": "Performance Improvements" },
+            { "type": "revert", "section": "Reverts" },
+            { "type": "docs", "section": "Documentation", "hidden": false },
+            { "type": "style", "section": "Styles", "hidden": false },
+            {
+              "type": "chore",
+              "section": "Miscellaneous Chores",
+              "hidden": false
+            },
+            {
+              "type": "refactor",
+              "section": "Code Refactors",
+              "hidden": false
+            },
+            { "type": "test", "section": "Tests", "hidden": false },
+            { "type": "build", "section": "Build System", "hidden": false },
+            { "type": "ci", "section": "CI/CD", "hidden": false },
+            {
+              "type": "improvement",
+              "section": "Improvements",
+              "hidden": false
+            }
+          ]
+        }
       }
     ],
     [

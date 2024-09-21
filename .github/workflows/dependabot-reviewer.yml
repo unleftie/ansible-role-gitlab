@@ -8,6 +8,9 @@ permissions:
   contents: write
   actions: write
 
+concurrency:
+  group: dependabot
+
 jobs:
   dependabot:
     runs-on: ubuntu-latest
@@ -15,23 +18,23 @@ jobs:
     if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
+        uses: step-security/harden-runner@v2
         with:
           disable-sudo: true
           egress-policy: "audit"
 
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
 
       - name: Dependency Review
-        uses: actions/dependency-review-action@0c155c5e8556a497adf53f2c18edabf945ed8e70 # v4.3.2
+        uses: actions/dependency-review-action@v4
         with:
           license-check: true
           vulnerability-check: true
           fail-on-severity: "low"
 
       - name: Fetch Dependabot metadata
-        uses: dependabot/fetch-metadata@dbb049abf0d677abbd7f7eee0375145b417fdd34 # v2.2.0
+        uses: dependabot/fetch-metadata@v2
         with:
           alert-lookup: true
           compat-lookup: true
@@ -47,37 +50,4 @@ jobs:
         with:
           approve-only: false
           merge-comment: "I'm **approving** this PR because **it includes dependency update**"
-          use-github-auto-merge: false
-
-  release:
-    name: Publish Release
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
-    needs: [dependabot]
-    permissions:
-      packages: write
-      contents: write
-      issues: write
-      pull-requests: write
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
-        with:
-          disable-sudo: true
-          egress-policy: audit
-
-      - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@cb425203a562475bca039ba4dbf90c7f9ac790f4 #v4.1.0
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          extra_plugins: |
-            conventional-changelog-conventionalcommits@6.1.0
-            @semantic-release/github@10.1.1
+          use-github-auto-merge: true

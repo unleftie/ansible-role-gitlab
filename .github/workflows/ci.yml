@@ -5,20 +5,17 @@ on:
       runKics:
         description: Run KICS scan
         type: boolean
-        default: true
+        default: false
         required: false
       runLint:
         description: Run Ansible Lint
         type: boolean
         default: true
+        required: false
       runMolecule:
         description: Run Ansible Molecule
         type: boolean
         default: true
-      publishRelease:
-        description: Publish Release
-        type: boolean
-        default: false
         required: false
   push:
     paths-ignore: ["**.md", "LICENSE", ".github/dependabot.yml"]
@@ -27,9 +24,22 @@ on:
     paths-ignore: ["**.md", "LICENSE", ".github/dependabot.yml"]
     branches: ["master", "main"]
     types: [opened, reopened]
+  # run on dependabot's push, see https://github.com/fastify/github-action-merge-dependabot/issues/134
+  workflow_run:
+    workflows: ["Approve and Merge Dependabot's PR"]
+    branches: ["dependabot/**"]
+    types: [completed]
 
 env:
   KICS_SCAN_PATH: "./"
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: CD
+  cancel-in-progress: false
 
 jobs:
   scan:
@@ -37,9 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: |
-      inputs.runKics == true ||
-      github.event_name == 'push' ||
-      github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]'
+      github.event_name != 'pull_request' &&
+      github.event.workflow_run.conclusion != 'failure'
     permissions:
       contents: read
       issues: write
@@ -48,25 +57,26 @@ jobs:
       actions: read
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
+        uses: step-security/harden-runner@v2
         with:
           disable-sudo: true
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
 
       - name: Run KICS scan
-        uses: checkmarx/kics-github-action@aacf8e81cd48e227259c937c215b352e02ad447a # v2.1.0
+        uses: checkmarx/kics-github-action@v2
         with:
           path: ${{ env.KICS_SCAN_PATH }}
           fail_on: high
           output_formats: "json,sarif"
           exclude_paths: ".github/workflows/scorecard.yml"
+          exclude_queries: "555ab8f9-2001-455e-a077-f2d0f41e2fb9" # Unpinned Actions Full Length Commit SHA
         continue-on-error: true
 
       - name: Upload to code-scanning
-        uses: github/codeql-action/upload-sarif@eb055d739abdc2e8de2e5f4ba1a8b246daa779aa # v3.26.0
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
 
@@ -75,30 +85,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: |
-      inputs.runLint == true ||
-      github.event_name == 'push' ||
-      github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]'
+      github.event.workflow_run.conclusion != 'failure'
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
+        uses: step-security/harden-runner@v2
         with:
           disable-sudo: true
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
 
       - name: Run Ansible Lint
-        uses: unleftie/ansible-lint-action@fb68beedc1162b8c0e9de2a58df89cef09d8bc07 # v1.2.0
+        uses: unleftie/ansible-lint-action@v1
 
   molecule:
     name: Ansible Molecule
     runs-on: ubuntu-latest
     timeout-minutes: 15
     if: |
-      inputs.runMolecule == true ||
-      github.event_name == 'push' ||
-      github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]'
+      github.event.workflow_run.conclusion != 'failure'
     strategy:
       fail-fast: false
       matrix:
@@ -107,16 +113,16 @@ jobs:
 
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
+        uses: step-security/harden-runner@v2
         with:
           disable-sudo: true
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
 
       - name: Run Ansible Molecule
-        uses: unleftie/ansible-molecule-action@e8cecf7f6dfab2293dd28df032318e6a698c60a3 # v1.7.0
+        uses: unleftie/ansible-molecule-action@v1
         with:
           github_token: ${{ github.token }}
           role_name: ${{ github.event.repository.name }}
@@ -126,11 +132,10 @@ jobs:
     name: Publish Release
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    needs: [lint, molecule]
     if: |
-      inputs.publishRelease == true ||
-      github.event_name == 'push' ||
-      github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]'
-    needs: [scan, lint, molecule]
+      github.event_name != 'pull_request' &&
+      github.event.workflow_run.conclusion != 'failure'
     permissions:
       packages: write
       contents: write
@@ -138,22 +143,23 @@ jobs:
       pull-requests: write
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
+        uses: step-security/harden-runner@v2
         with:
           disable-sudo: true
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@cb425203a562475bca039ba4dbf90c7f9ac790f4 #v4.1.0
+        uses: cycjimmy/semantic-release-action@v4
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
+          semantic_version: 24
           extra_plugins: |
-            conventional-changelog-conventionalcommits@6.1.0
-            @semantic-release/github@10.1.1
+            conventional-changelog-conventionalcommits@8.0.0
+            @semantic-release/github@10.3.5
