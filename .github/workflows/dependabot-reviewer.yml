@@ -37,6 +37,11 @@ jobs:
           compat-lookup: true
           github-token: ${{ github.token }}
 
+      - name: Label PR
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ github.token }}
+
       - name: Approve and Merge PR
         uses: fastify/github-action-merge-dependabot@main
         with:
