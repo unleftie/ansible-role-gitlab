@@ -2,7 +2,7 @@ name: Scorecard
 on:
   workflow_dispatch:
   schedule:
-    - cron: "5 4 1 * *"
+    - cron: "5 4 1 * *" # at 04:05 on day-of-month 1
 
 # Declare default permissions as read only.
 permissions: read-all
@@ -13,14 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      security-events: write # Needed to upload the results to code-scanning dashboard.
-      id-token: write # Needed to publish results and get a badge.
+      security-events: write
+      id-token: write
       contents: read
       actions: read
 
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
+        uses: step-security/harden-runner@v2
         with:
           egress-policy: audit
 
@@ -30,14 +30,14 @@ jobs:
           persist-credentials: false
 
       - name: Run analysis
-        uses: ossf/scorecard-action@62b2cac7ed8198b15735ed49ab1e5cf35480ba46 # v2.4.0
+        uses: ossf/scorecard-action@v2
         with:
           results_file: results.sarif
           results_format: sarif
           publish_results: true
 
       - name: Upload artifact
-        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
+        uses: actions/upload-artifact@v4
         with:
           name: scorecard_result_files
           path: results.*
