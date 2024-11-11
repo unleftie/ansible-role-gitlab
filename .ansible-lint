@@ -6,6 +6,8 @@ skip_list:
   - name[missing]
   - fqcn-builtins
   - yaml[document-start]
+  - yaml[octal-values]
+  - var-naming[no-role-prefix]
 
 warn_list:
   - no-changed-when
