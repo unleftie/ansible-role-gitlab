@@ -134,7 +134,6 @@ jobs:
     needs: [lint, molecule]
     if: github.event_name == 'push'
     permissions:
-      packages: write
       contents: write
       issues: write
       pull-requests: write
