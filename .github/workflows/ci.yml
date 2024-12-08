@@ -24,11 +24,6 @@ on:
     paths-ignore: ["**.md", "LICENSE", ".github/dependabot.yml"]
     branches: ["master", "main"]
     types: [opened, reopened]
-  # run on dependabot's push, see https://github.com/fastify/github-action-merge-dependabot/issues/134
-  workflow_run:
-    workflows: ["Approve and Merge Dependabot's PR"]
-    branches: ["dependabot/**"]
-    types: [completed]
 
 env:
   KICS_SCAN_PATH: "./"
@@ -47,8 +42,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: |
-      github.event_name != 'pull_request' &&
-      github.event.workflow_run.conclusion != 'failure'
+      inputs.runKics == true ||
+      github.event_name == 'push'
     permissions:
       contents: read
       issues: write
@@ -85,7 +80,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: |
-      github.event.workflow_run.conclusion != 'failure'
+      inputs.runLint == true ||
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request'
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@v2
@@ -104,9 +101,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     if: |
-      github.event.workflow_run.conclusion != 'failure'
+      inputs.runMolecule == true ||
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request'
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         distro:
           - debian12
@@ -133,9 +132,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [lint, molecule]
-    if: |
-      github.event_name != 'pull_request' &&
-      github.event.workflow_run.conclusion != 'failure'
+    if: github.event_name == 'push'
     permissions:
       packages: write
       contents: write
