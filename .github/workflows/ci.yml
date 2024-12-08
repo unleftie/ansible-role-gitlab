@@ -33,7 +33,7 @@ defaults:
     shell: bash
 
 concurrency:
-  group: CD
+  group: CI
   cancel-in-progress: false
 
 jobs:
