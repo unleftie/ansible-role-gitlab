@@ -7,6 +7,8 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "chore"
+    assignees:
+      - "unleftie"
     labels:
       - "dependencies"
       - "dependabot"
