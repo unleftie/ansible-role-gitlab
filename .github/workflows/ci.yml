@@ -28,6 +28,8 @@ on:
 env:
   KICS_SCAN_PATH: "./"
 
+permissions: {}
+
 defaults:
   run:
     shell: bash

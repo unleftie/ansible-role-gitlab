@@ -3,9 +3,7 @@ on:
   pull_request:
     types: [opened]
 
-permissions:
-  pull-requests: write
-  contents: write
+permissions: {}
 
 concurrency:
   group: dependabot
@@ -15,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@v2
