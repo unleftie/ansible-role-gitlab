@@ -3,5 +3,6 @@
   hosts: all
   become: true
   tasks:
-    - include_role:
-        name: "{{ lookup('env', 'ROLE_NAME') | default('ansible-role-gitlab', true) }}"
+    - name: Include the role
+      include_role:
+        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"

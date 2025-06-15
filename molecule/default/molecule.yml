@@ -21,6 +21,8 @@ provisioner:
       display_skipped_hosts: false
   lint:
     name: ansible-lint
+  env:
+    ANSIBLE_ROLES_PATH: "../../:../../../:${ANSIBLE_ROLES_PATH}"
 scenario:
   test_sequence:
     - cleanup
