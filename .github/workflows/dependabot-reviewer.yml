@@ -41,7 +41,7 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: Label PR
-        uses: actions/labeler@v5
+        uses: actions/labeler@v6
         with:
           repo-token: ${{ github.token }}
 
