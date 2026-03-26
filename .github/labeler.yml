@@ -1,5 +1,0 @@
-dependabot:
-  - head-branch: ["^dependabot", "dependabot"]
-
-dependencies:
-  - head-branch: ["^dependabot", "dependabot"]
