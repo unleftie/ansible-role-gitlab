@@ -3,19 +3,23 @@
   hosts: all
   become: true
   vars:
-    github_user: "aelsabbahy"
+    github_user: "goss-org"
     github_repo: "goss"
     goss_version: "latest"
+    goss_version_number: "{{ goss_version | regex_replace('^v', '') }}"
     goss_arch: "{{ goss_arch_map[ansible_architecture] | default(ansible_architecture) }}"
     goss_dst: "/usr/bin/goss"
-    goss_url: "https://github.com/{{ github_user }}/{{ github_repo }}/releases/download/{{ goss_version }}/goss-linux-{{ goss_arch }}"
+    goss_archive: "goss_{{ goss_version_number }}_linux_{{ goss_arch }}.tar.gz"
+    goss_url: "https://github.com/{{ github_user }}/{{ github_repo }}/releases/download/{{ goss_version }}/{{ goss_archive }}"
+    goss_checksums_url: "https://github.com/{{ github_user }}/{{ github_repo }}/releases/download/{{ goss_version }}/goss_{{ goss_version_number }}_SHA256SUMS"
+    goss_extract_directory: "/tmp/goss-extract"
     goss_test_directory: "/tmp"
     goss_format: "tap"
     goss_arch_map:
-      i386: "386"
-      x86_64: "amd64"
+      i386: "i386"
+      x86_64: "x86_64"
       aarch64: "arm64"
-      armv7l: "armv7"
+      armv7l: "armv6"
       armv6l: "armv6"
   tasks:
     - name: Include defaults vars
@@ -55,18 +59,37 @@
       when: goss_version == "latest"
       run_once: true
 
-    - name: Download and install Goss
+    - name: Download Goss archive
       get_url:
         url: "{{ goss_url }}"
-        dest: "{{ goss_dst }}"
-        checksum: "sha256:{{ goss_url }}.sha256"
-        mode: "0755"
+        dest: "/tmp/{{ goss_archive }}"
+        checksum: "sha256:{{ goss_checksums_url }}"
+        mode: "0644"
         headers:
           Authorization: "Bearer {{ lookup('env', 'GITHUB_TOKEN') }}"
       register: _progress_status
       until: _progress_status is succeeded
       delay: 5
       retries: 5
+
+    - name: Ensure Goss extract directory exists
+      file:
+        path: "{{ goss_extract_directory }}"
+        state: directory
+        mode: "0755"
+
+    - name: Extract Goss archive
+      unarchive:
+        src: "/tmp/{{ goss_archive }}"
+        dest: "{{ goss_extract_directory }}"
+        remote_src: true
+
+    - name: Install Goss binary
+      copy:
+        src: "{{ goss_extract_directory }}/goss"
+        dest: "{{ goss_dst }}"
+        mode: "0755"
+        remote_src: true
 
     - name: Copy Goss tests to remote
       template:
