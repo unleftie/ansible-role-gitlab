@@ -1,0 +1,30 @@
+---
+- name: Pre-up playbook
+  gather_facts: false
+  ignore_unreachable: true
+  hosts: all
+  tasks:
+    - name: Determine hosts that are up
+      block:
+        - name: Wait for hosts
+          wait_for_connection:
+            delay: 0
+            sleep: 30
+            timeout: 90
+          vars:
+            ansible_connection: ssh
+
+        - name: Group up hosts that are up
+          group_by:
+            key: "running_hosts"
+          changed_when: false
+      rescue:
+        - name: Print unreachable hosts
+          debug:
+            msg: "HOST UNREACHABLE {{ inventory_hostname }}"
+
+- name: Initial playbook
+  hosts: running_hosts
+  become: true
+  roles:
+    - ansible-role-hardening

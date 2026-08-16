@@ -7,11 +7,11 @@ galaxy_info:
   description: Role for Omnibus Gitlab setup
   company: ""
   license: "license (MIT)"
-  min_ansible_version: "2.10"
+  min_ansible_version: "2.14"
   platforms:
-    - name: Debian
+    - name: Ubuntu
       versions:
-        - bookworm
+        - resolute
   galaxy_tags:
     - gitlab
     - omnibus

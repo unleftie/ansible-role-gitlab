@@ -7,7 +7,7 @@
     github_repo: "goss"
     goss_version: "latest"
     goss_version_number: "{{ goss_version | regex_replace('^v', '') }}"
-    goss_arch: "{{ goss_arch_map[ansible_architecture] | default(ansible_architecture) }}"
+    goss_arch: "{{ goss_arch_map[ansible_facts['architecture']] | default(ansible_facts['architecture']) }}"
     goss_dst: "/usr/bin/goss"
     goss_archive: "goss_{{ goss_version_number }}_linux_{{ goss_arch }}.tar.gz"
     goss_url: "https://github.com/{{ github_user }}/{{ github_repo }}/releases/download/{{ goss_version }}/{{ goss_archive }}"
@@ -22,19 +22,32 @@
       armv7l: "armv6"
       armv6l: "armv6"
   tasks:
+    - name: Check for defaults directory
+      stat:
+        path: "../../defaults"
+      register: _defaults_dir
+
+    - name: Check for vars directory
+      stat:
+        path: "../../vars"
+      register: _vars_dir
+
     - name: Include defaults vars
       include_vars:
         dir: "../../defaults"
         extensions: ["yml", "yaml"]
+      when: _defaults_dir.stat.exists
 
     - name: Include vars
       include_vars:
         dir: "../../vars"
         extensions: ["yml", "yaml"]
+      when: _vars_dir.stat.exists
 
     - name: Ensure dependencies are installed
       pip:
         name: github3.py
+        break_system_packages: true
       register: _progress_status
       until: _progress_status is succeeded
       delay: 5
@@ -94,10 +107,10 @@
     - name: Copy Goss tests to remote
       template:
         src: "{{ item }}"
-        dest: "{{ goss_test_directory }}/{{ item | basename }}"
+        dest: "{{ goss_test_directory }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
         mode: "0644"
       with_fileglob:
-        - "{{ lookup('env', 'MOLECULE_VERIFIER_TEST_DIRECTORY') }}/*.yml"
+        - "{{ lookup('env', 'MOLECULE_VERIFIER_TEST_DIRECTORY') }}/*.yml.j2"
 
     - name: Register test files
       shell: "ls {{ goss_test_directory }}/*.yml"
